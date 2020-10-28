@@ -146,7 +146,7 @@ static const Config_RobotParam_t param_infantry = {
         .trig = -1.0f,
       },
     },
-    .bullet_speed_scaler = 1.0f,
+    .bullet_speed_scaler = 10.0f,
     .bullet_speed_bias = 1.0f,
     .num_trig_tooth = 8.0f,
   }, /* shoot */
