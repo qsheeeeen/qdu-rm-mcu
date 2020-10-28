@@ -153,6 +153,8 @@ int8_t Shoot_UpdateFeedback(Shoot_t *s, const CAN_t *can) {
  * \return 函数运行结果
  */
 int8_t Shoot_Control(Shoot_t *s, CMD_ShootCmd_t *s_cmd, float dt_sec) {
+  static uint32_t period_ms_back = 0;	
+
   if (s == NULL) return -1;
 
   Shoot_SetMode(s, s_cmd->mode);
