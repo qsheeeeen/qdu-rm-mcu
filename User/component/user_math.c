@@ -79,3 +79,22 @@ inline void CircleAdd(float *origin, float delta, float range) {
   }
   *origin = out;
 }
+
+/*!
+ * \brief 循环减法，用于没有负数值，并在一定范围内变化的值
+ * 例如编码器，在0-2PI内变化，1.5PI + 1.5PI = 1PI
+ *
+ * \param origin 被操作的值
+ * \param delta 变化量
+ * \param range 被操作的值变化范围，正数时起效
+ */
+inline void CircleSub(float *origin, float delta, float range) {
+  float out = *origin - delta;
+  if (range > 0.0f) {
+    if (out >= range)
+      out -= range;
+    else if (out < 0.0f)
+      out += range;
+  }
+  *origin = out;
+}
