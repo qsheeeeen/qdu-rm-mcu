@@ -20,7 +20,7 @@
  */
 static void TrigTimerCallback(void *arg) {
   Shoot_t *s = (Shoot_t *)arg;
-  CircleAdd(&(s->setpoint.trig_angle), M_2PI / s->param->num_trig_tooth, M_2PI);
+  CircleSub(&(s->setpoint.trig_angle), M_2PI / s->param->num_trig_tooth, M_2PI);
 }
 
 /*!
@@ -95,7 +95,7 @@ int8_t Shoot_Init(Shoot_t *s, const Shoot_Params_t *param, float target_freq) {
                          param->low_pass_cutoff_freq.out.fric);
   }
 
-  PID_Init(&(s->pid.trig), KPID_MODE_NO_D, target_freq,
+  PID_Init(&(s->pid.trig), KPID_MODE_CALC_D_FB, target_freq,
            &(param->trig_pid_param));
 
   LowPassFilter2p_Init(&(s->filter.in.trig), target_freq,
@@ -130,8 +130,7 @@ int8_t Shoot_UpdateFeedback(Shoot_t *s, const CAN_t *can) {
   s->feedback.trig_angle =
       can->shoot_motor_feedback[CAN_MOTOR_SHOOT_TRIG].rotor_angle;
 	motor_angle_delta = s->feedback.trig_angle - motor_trig_angle_back;
-	motor_angle_delta = -((int)(motor_angle_delta * 100)) / 100.0;
-	if(motor_angle_delta < -0.01)
+	if(motor_angle_delta < 0.f)
 		motor_angle_delta += M_2PI;
 	if(motor_angle_delta > M_PI)
 		motor_angle_delta -= M_2PI;
@@ -169,7 +168,7 @@ int8_t Shoot_Control(Shoot_t *s, CMD_ShootCmd_t *s_cmd, float dt_sec) {
       s->param->bullet_speed_bias;
   s->setpoint.fric_rpm[1] = -s->setpoint.fric_rpm[0];
 	
-  if (s_cmd->shoot_freq_hz > 1.f) {
+  if (s_cmd->shoot_freq_hz > 0.f && s->mode != SHOOT_MODE_RELAX) {
 		uint32_t period_ms = 1000u / (uint32_t)s_cmd->shoot_freq_hz;
 		
 		if(period_ms_back != period_ms || !osTimerIsRunning(s->trig_timer_id)){
