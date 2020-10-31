@@ -65,6 +65,7 @@ float CircleError(float sp, float fb, float range);
  * \param range 被操作的值变化范围，正数时起效
  */
 void CircleAdd(float *origin, float delta, float range);
+void CircleSub(float *origin, float delta, float range);
 
 #ifdef __cplusplus
 }
