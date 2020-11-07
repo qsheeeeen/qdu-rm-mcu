@@ -56,6 +56,8 @@ int8_t Gimbal_Init(Gimbal_t *g, const Gimbal_Params_t *param,
 
   g->param = param;            /* 初始化参数 */
   g->mode = GIMBAL_MODE_RELAX; /* 设置默认模式 */
+  g->wise_y = ANTICLOCK_WISE;  /* 设置默认方向 */
+  g->wise_p = ANTICLOCK_WISE;
 
   /* 初始化云台电机控制PID和LPF */
   PID_Init(&(g->pid[GIMBAL_PID_YAW_ANGLE_IDX]), KPID_MODE_NO_D, target_freq,
@@ -120,6 +122,10 @@ int8_t Gimbal_Control(Gimbal_t *g, Gimbal_Feedback_t *fb,
   if (g->setpoint.eulr.yaw == 0.0f) {
     g->setpoint.eulr.yaw = fb->eulr.imu.yaw;
   }
+
+  /* 判断云台方向 */
+  if (g->wise_p == ANTICLOCK_WISE) g_cmd->delta_eulr.pit = -(g_cmd->delta_eulr.pit);
+  if (g->wise_y == ANTICLOCK_WISE) g_cmd->delta_eulr.yaw = -(g_cmd->delta_eulr.yaw);
 
   /* 处理控制命令，限制setpoint范围 */
   CircleAdd(&(g->setpoint.eulr.yaw), g_cmd->delta_eulr.yaw, M_2PI);
