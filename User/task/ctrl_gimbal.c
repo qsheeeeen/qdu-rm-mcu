@@ -1,15 +1,4 @@
 /*
- * @Author: lc
- * @LastEditors: lc
- * @email: 2592509183@qq..com
- * @github: https://github.com/Jiu-xiao/
- * @Date: 2020-11-07 18:08:34
- * @LastEditTime: 2020-11-07 18:36:22
- * @motto: 摸鱼使我快乐
- * @FilePath:
- * \MDK-ARMd:\doc\ee\robomaster\qdu-robomaster-mcu-2020\User\task\ctrl_gimbal.c
- */
-/*
   云台控制任务
 
   控制云台行为。
