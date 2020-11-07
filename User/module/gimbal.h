@@ -76,6 +76,9 @@ typedef struct {
   } eulr;                /* 欧拉角 */
 } Gimbal_Feedback_t;
 
+/* 云台旋转方向 */
+typedef enum { CLOCK_WISE, ANTICLOCK_WISE } WISE_P_t, WISE_Y_t;
+
 /*
  * 运行的主结构体，所有这个文件里的函数都在操作这个结构体。
  * 包含了初始化参数，中间变量，输出变量。
@@ -90,8 +93,9 @@ typedef struct {
     AHRS_Eulr_t eulr; /* 表示云台姿态的欧拉角 */
   } setpoint;         /* PID计算的目标值 */
 
-  KPID_t pid[GIMBAL_PID_NUM]; /* PID数组 */
-
+  KPID_t pid[GIMBAL_PID_NUM];                    /* PID数组 */
+  WISE_P_t wise_p;                               /* 云台p轴旋转方向 */
+  WISE_Y_t wise_y;                               /* 云台p轴旋转方向 */
   LowPassFilter2p_t filter_out[GIMBAL_ACTR_NUM]; /* 输出滤波器滤波器数组 */
 
   float out[GIMBAL_ACTR_NUM]; /* 输出数组 */

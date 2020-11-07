@@ -1,4 +1,15 @@
 /*
+ * @Author: lc
+ * @LastEditors: lc
+ * @email: 2592509183@qq..com
+ * @github: https://github.com/Jiu-xiao/
+ * @Date: 2020-11-07 18:08:34
+ * @LastEditTime: 2020-11-07 18:36:22
+ * @motto: 摸鱼使我快乐
+ * @FilePath:
+ * \MDK-ARMd:\doc\ee\robomaster\qdu-robomaster-mcu-2020\User\task\ctrl_gimbal.c
+ */
+/*
   云台控制任务
 
   控制云台行为。
@@ -62,13 +73,12 @@ void Task_CtrlGimbal(void *argument) {
     tick += delay_tick; /* 计算下一个唤醒时刻 */
 
     /* 等待接收CAN总线新数据 */
-    if (osMessageQueueGet(task_runtime.msgq.motor.feedback.gimbal,
-                          &can, NULL, delay_tick) != osOK) {
+    if (osMessageQueueGet(task_runtime.msgq.motor.feedback.gimbal, &can, NULL,
+                          delay_tick) != osOK) {
       /* 如果没有接收到新数据，则将输出置零，不进行控制 */
       CAN_ResetGimbalOut(&gimbal_out);
       osMessageQueuePut(task_runtime.msgq.motor.output.gimbal, &gimbal_out, 0,
                         0);
-
     } else {
       /* 继续读取控制指令、姿态、IMU数据 */
       osMessageQueueGet(task_runtime.msgq.gimbal.eulr_imu,
