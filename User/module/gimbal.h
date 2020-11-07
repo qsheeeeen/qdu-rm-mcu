@@ -100,7 +100,7 @@ typedef struct {
 
   WISE_t wise_p;                               /* 云台p轴旋转方向 */
  
-  WISE_t wise_y;                               /* 云台p轴旋转方向 */
+  WISE_t wise_y;                               /* 云台y轴旋转方向 */
 
   LowPassFilter2p_t filter_out[GIMBAL_ACTR_NUM]; /* 输出滤波器滤波器数组 */
 
