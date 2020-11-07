@@ -122,6 +122,7 @@ int8_t Gimbal_Control(Gimbal_t *g, Gimbal_Feedback_t *fb,
   if (g->setpoint.eulr.yaw == 0.0f) {
     g->setpoint.eulr.yaw = fb->eulr.imu.yaw;
   }
+  
   /* 云台方向 */
   if (g->wise_p == ANTICLOCK_WISE)
     g_cmd->delta_eulr.pit = -(g_cmd->delta_eulr.pit);

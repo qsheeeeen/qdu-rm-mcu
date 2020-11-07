@@ -68,6 +68,7 @@ void Task_CtrlGimbal(void *argument) {
       CAN_ResetGimbalOut(&gimbal_out);
       osMessageQueuePut(task_runtime.msgq.motor.output.gimbal, &gimbal_out, 0,
                         0);
+
     } else {
       /* 继续读取控制指令、姿态、IMU数据 */
       osMessageQueueGet(task_runtime.msgq.gimbal.eulr_imu,
