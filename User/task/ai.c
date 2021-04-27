@@ -62,10 +62,14 @@ void Task_Ai(void *argument) {
     osMessageQueueGet(task_runtime.msgq.cmd.ai, &(ai.status), NULL, 0);
     bool ref_update = (osMessageQueueGet(task_runtime.msgq.referee.ai,
                                          &(referee_ai), NULL, 0) == osOK);
-    AI_PackMCU(&ai, &quat);
+    AI_PackMcu(&ai, &quat);
     if (ref_update) AI_PackRef(&ai, &(referee_ai));
 
-    AI_StartSend(&(ai), ref_update);
+    AI_StartTrans(&(ai), ref_update);
+
+    AI_PackUi(&ai);
+    osMessageQueueReset(task_runtime.msgq.ui.ai);
+    osMessageQueuePut(task_runtime.msgq.ui.ai, &(ai.ui), 0, 0);
 
     osDelayUntil(tick);
   }
