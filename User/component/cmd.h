@@ -130,29 +130,6 @@ typedef struct {
   CMD_MoveParams_t move;                      /* 位移灵敏度参数 */
 } CMD_Params_t;
 
-/* AI行为状态 */
-typedef enum {
-  AI_STATUS_STOP,      /* 停止状态 */
-  AI_STATUS_AUTOAIM,   /* 自瞄状态 */
-  AI_STATUS_HITSWITCH, /* 打符状态 */
-  AI_STATUS_AUTOMATIC  /* 自动状态 */
-} CMD_AI_Status_t;
-
-/* UI所用行为状态 */
-typedef enum {
-  CMD_UI_NOTHING,          /* 当前无状态 */
-  CMD_UI_AUTO_AIM_START,   /* 自瞄状态开启 */
-  CMD_UI_AUTO_AIM_STOP,    /* 自瞄状态关闭 */
-  CMD_UI_HIT_SWITCH_START, /* 打符状态开启 */
-  CMD_UI_HIT_SWITCH_STOP   /* 打符状态关闭 */
-} CMD_UI_t;
-
-/*裁判系统发送的命令*/
-typedef struct {
-  CMD_UI_t cmd[CMD_REFEREE_MAX_NUM]; /* 命令数组 */
-  uint8_t counter;                   /* 命令计数 */
-} CMD_RefereeCmd_t;
-
 typedef struct {
   int16_t x;
   int16_t y;
@@ -184,7 +161,7 @@ typedef struct {
   uint16_t key_last;      /* 上次按键键值 */
   CMD_Mouse_t mouse_last; /* 鼠标值 */
 
-  CMD_AI_Status_t ai_status; /* AI状态 */
+  Game_AI_Status_t ai_status; /* AI状态 */
 
   const CMD_Params_t *param; /* 命令参数 */
 
@@ -230,6 +207,12 @@ typedef struct {
   bool fire; /* 开火状态 */
 } CMD_Host_t;
 
+/* UI所用行为状态 */
+typedef struct {
+  CMD_CtrlMethod_t ctrl_method;
+  CMD_CtrlSource_t ctrl_source;
+} CMD_UI_t;
+
 /**
  * @brief 解析行为命令
  *
@@ -251,7 +234,7 @@ bool CMD_CheckHostOverwrite(CMD_t *cmd);
  * @brief 解析命令
  *
  * @param rc 遥控器数据
- * @param cmd 命令
+ * @param cmd 控制指令数据
  * @param dt_sec 两次解析的间隔
  * @return int8_t 0对应没有错误
  */
@@ -261,8 +244,16 @@ int8_t CMD_ParseRc(const CMD_RC_t *rc, CMD_t *cmd, float dt_sec);
  * @brief 解析上位机命令
  *
  * @param host host数据
- * @param cmd 命令
+ * @param cmd 控制指令数据
  * @param dt_sec 两次解析的间隔
  * @return int8_t 0对应没有错误
  */
 int8_t CMD_ParseHost(const CMD_Host_t *host, CMD_t *cmd, float dt_sec);
+
+/**
+ * @brief 导出控制指令UI数据
+ *
+ * @param cmd_ui 控制指令UI数据
+ * @param cmd 控制指令数据
+ */
+void CMD_PackUi(CMD_UI_t *cmd_ui, const CMD_t *cmd);
