@@ -168,7 +168,6 @@ typedef struct {
   CMD_ChassisCmd_t chassis;   /* 底盘控制命令 */
   CMD_GimbalCmd_t gimbal;     /* 云台控制命令 */
   CMD_LauncherCmd_t launcher; /* 发射器控制命令 */
-  CMD_RefereeCmd_t referee;   /* 裁判系统发送命令 */
 } CMD_t;
 
 typedef struct {

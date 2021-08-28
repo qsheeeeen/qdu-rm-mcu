@@ -395,9 +395,12 @@ int8_t CMD_ParseHost(const CMD_Host_t *host, CMD_t *cmd, float dt_sec) {
 }
 
 /**
-  *@brief 导出控制指令UI数据 **@param cmd_ui 控制指令UI数据 *@param cmd
-          控制指令数据 * /
-      void CMD_PackUi(CMD_UI_t * cmd_ui, const CMD_t *cmd) {
-    cmd_ui->ctrl_method = cmd->ctrl_method;
-    cmd_ui->ctrl_source = cmd->ctrl_source;
-  }
+ * @brief 导出控制指令UI数据
+ *
+ * @param cmd_ui 控制指令UI数据
+ * @param cmd 控制指令数据
+ */
+void CMD_PackUi(CMD_UI_t *cmd_ui, const CMD_t *cmd) {
+  cmd_ui->ctrl_method = cmd->ctrl_method;
+  cmd_ui->ctrl_source = cmd->ctrl_source;
+}
