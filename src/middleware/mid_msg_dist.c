@@ -192,10 +192,13 @@ bool msg_dist_poll(subscriber_t *subscriber, void *data, uint32_t timeout) {
   BaseType_t ret = pdFALSE;
   if (timeout) {
     ret = xSemaphoreTake(subscriber->bin_sem, pdMS_TO_TICKS(timeout));
+  } else {
+    ret = pdTRUE;
   }
-  if ((ret == pdTRUE) || (!timeout)) {
+
+  if (ret == pdTRUE) {
     memcpy(data, topic->data_buf, topic->data_size);
-    return ret == pdTRUE;
+    return true;
   }
   topic->monitor.unexpected++;
   return false;
