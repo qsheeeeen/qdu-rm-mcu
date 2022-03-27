@@ -80,7 +80,7 @@ UART_HandleTypeDef *BSP_UART_GetHandle(BSP_UART_t uart) {
       return &huart6;
     /*
     case BSP_UART_XXX:
-            return &huartX;
+      return &huartX;
     */
     default:
       return NULL;

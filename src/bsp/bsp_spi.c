@@ -65,7 +65,7 @@ SPI_HandleTypeDef *BSP_SPI_GetHandle(BSP_SPI_t spi) {
       return &hspi1;
     /*
     case BSP_SPI_XXX:
-            return &hspiX;
+      return &hspiX;
     */
     default:
       return NULL;
