@@ -75,10 +75,10 @@ static void IST8310_IntCallback(void) {
   portYIELD_FROM_ISR(switch_required);
 }
 
-int8_t ist8310_init(ist8310_t *ist8310, const ist8310_cali_t *cali) {
+err_t ist8310_init(ist8310_t *ist8310, const ist8310_cali_t *cali) {
   ASSERT(ist8310);
   ASSERT(cali);
-  if (inited) return DEVICE_ERR_INITED;
+  if (inited) return ERR_INITED;
   VERIFY((thread_alert = xTaskGetCurrentTaskHandle()) != NULL);
 
   ist8310->cali = cali;
@@ -88,8 +88,7 @@ int8_t ist8310_init(ist8310_t *ist8310, const ist8310_cali_t *cali) {
   IST8310_SET();
   BSP_Delay(50);
 
-  if (IST8310_ReadSingle(IST8310_WAI) != IST8310_CHIP_ID)
-    return DEVICE_ERR_NO_DEV;
+  if (IST8310_ReadSingle(IST8310_WAI) != IST8310_CHIP_ID) return ERR_NODEV;
 
   BSP_GPIO_DisableIRQ(CMPS_INT_Pin);
 
@@ -111,7 +110,7 @@ int8_t ist8310_init(ist8310_t *ist8310, const ist8310_cali_t *cali) {
   inited = true;
 
   BSP_GPIO_EnableIRQ(CMPS_INT_Pin);
-  return DEVICE_OK;
+  return RM_OK;
 }
 
 bool ist8310_wait_new(uint32_t timeout) {
@@ -119,16 +118,16 @@ bool ist8310_wait_new(uint32_t timeout) {
                          pdMS_TO_TICKS(timeout));
 }
 
-int8_t ist8310_start_dma_recv() {
+err_t ist8310_start_dma_recv() {
   IST8310_Read(IST8310_DATAXL, ist8310_rxbuf, IST8310_LEN_RX_BUFF);
-  return DEVICE_OK;
+  return RM_OK;
 }
 
 uint32_t ist8310_wait_dma_cplt() {
   return xTaskNotifyWait(0, 0, (uint32_t *)SIGNAL_IST8310_MAGN_RAW_REDY, 0);
 }
 
-int8_t ist8310_parse(ist8310_t *ist8310) {
+err_t ist8310_parse(ist8310_t *ist8310) {
   ASSERT(ist8310);
 
 #if 1
@@ -163,5 +162,5 @@ int8_t ist8310_parse(ist8310_t *ist8310) {
   ist8310->magn.z = (ist8310->magn.z - ist8310->cali->magn_offset.y) *
                     ist8310->cali->magn_scale.z;
 
-  return DEVICE_OK;
+  return RM_OK;
 }

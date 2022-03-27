@@ -46,16 +46,16 @@ typedef struct {
   ai_mode_t mode;
 } ai_ui_t;
 
-int8_t ai_init(ai_t *ai);
-int8_t ai_restart(void);
+err_t ai_init(ai_t *ai);
+err_t ai_restart(void);
 
 bool ai_start_receiving(ai_t *ai);
 bool ai_wait_recv_cplt(ai_t *ai, uint32_t timeout);
 bool ai_start_trans(ai_t *ai);
 bool ai_wait_trans_cplt(ai_t *ai, uint32_t timeout);
-int8_t ai_parse_host(ai_t *ai);
-int8_t ai_handle_offline(ai_t *ai);
-int8_t ai_pack_mcu_for_host(ai_t *ai, const quaternion_t *quat);
-int8_t ai_pack_ref_for_host(ai_t *ai, const referee_for_ai_t *ref);
+err_t ai_parse_host(ai_t *ai);
+err_t ai_handle_offline(ai_t *ai);
+err_t ai_pack_mcu_for_host(ai_t *ai, const quaternion_t *quat);
+err_t ai_pack_ref_for_host(ai_t *ai, const referee_for_ai_t *ref);
 void ai_pack_ui(ai_ui_t *ui, const ai_t *ai);
 void ai_pack_cmd(ai_t *ai, cmd_host_t *cmd_host);

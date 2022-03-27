@@ -29,9 +29,9 @@ static void ia_tx_cplt_callback(void *arg) {
   portYIELD_FROM_ISR(switch_required);
 }
 
-int8_t ai_init(ai_t *ai) {
+err_t ai_init(ai_t *ai) {
   ASSERT(ai);
-  if (inited) return DEVICE_ERR_INITED;
+  if (inited) return ERR_INITED;
   inited = true;
 
   ai->sem.recv = xSemaphoreCreateBinary();
@@ -41,13 +41,13 @@ int8_t ai_init(ai_t *ai) {
                             ia_rx_cplt_callback);
   BSP_UART_RegisterCallback(BSP_UART_AI, BSP_UART_TX_CPLT_CB,
                             ia_tx_cplt_callback);
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-int8_t ai_restart(void) {
+err_t ai_restart(void) {
   __HAL_UART_DISABLE(BSP_UART_GetHandle(BSP_UART_AI));
   __HAL_UART_ENABLE(BSP_UART_GetHandle(BSP_UART_AI));
-  return DEVICE_OK;
+  return RM_OK;
 }
 
 bool ai_start_receiving(ai_t *ai) {
@@ -78,22 +78,22 @@ bool ai_wait_trans_cplt(ai_t *ai, uint32_t timeout) {
   return xSemaphoreTake(ai->sem.trans, pdMS_TO_TICKS(timeout)) == pdTRUE;
 }
 
-int8_t ai_parse_host(ai_t *ai) {
+err_t ai_parse_host(ai_t *ai) {
   if (!crc16_verify((const uint8_t *)&(rxbuf), sizeof(ai->form_host))) {
     ai->online = true;
     memcpy(&(ai->form_host), rxbuf, sizeof(ai->form_host));
     memset(rxbuf, 0, AI_LEN_RX_BUFF);
-    return DEVICE_OK;
+    return RM_OK;
   }
-  return DEVICE_ERR;
+  return ERR_FAIL;
 }
 
-int8_t ai_handle_offline(ai_t *ai) {
+err_t ai_handle_offline(ai_t *ai) {
   ai->online = false;
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-int8_t ai_pack_mcu_for_host(ai_t *ai, const quaternion_t *quat) {
+err_t ai_pack_mcu_for_host(ai_t *ai, const quaternion_t *quat) {
   ai->to_host.mcu.id = AI_ID_MCU;
   memcpy(&(ai->to_host.mcu.package.data.quat), (const void *)quat,
          sizeof(*quat));
@@ -108,10 +108,10 @@ int8_t ai_pack_mcu_for_host(ai_t *ai, const quaternion_t *quat) {
   ai->to_host.mcu.package.crc16 = crc16_calc(
       (const uint8_t *)&(ai->to_host.mcu.package),
       sizeof(ai->to_host.mcu.package) - sizeof(uint16_t), CRC16_INIT);
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-int8_t ai_pack_ref_for_host(ai_t *ai, const referee_for_ai_t *ref) {
+err_t ai_pack_ref_for_host(ai_t *ai, const referee_for_ai_t *ref) {
   RM_UNUSED(ref);
   ai->to_host.ref.id = AI_ID_REF;
   ai->to_host.ref.package.data.team = ref->team;
@@ -120,7 +120,7 @@ int8_t ai_pack_ref_for_host(ai_t *ai, const referee_for_ai_t *ref) {
       sizeof(ai->to_host.ref.package) - sizeof(uint16_t), CRC16_INIT);
 
   ai->ref_updated = false;
-  return DEVICE_OK;
+  return RM_OK;
 }
 
 void ai_pack_ui(ai_ui_t *ui, const ai_t *ai) { ui->mode = ai->mode; }

@@ -51,6 +51,7 @@ typedef enum {
   ERR_NULL,    /* NULL pointer */
   ERR_NODEV,   /* No such device */
   ERR_TIMEOUT, /* Waited to long */
+  ERR_INITED,  /* Already inited */
 } err_t;
 
 typedef enum {

@@ -51,43 +51,43 @@ static bool DR16_DataCorrupted(const dr16_t *dr16) {
   return false;
 }
 
-int8_t dr16_init(dr16_t *dr16) {
+err_t dr16_init(dr16_t *dr16) {
   ASSERT(dr16);
-  if (inited) return DEVICE_ERR_INITED;
+  if (inited) return ERR_INITED;
   VERIFY((thread_alert = xTaskGetCurrentTaskHandle()) != NULL);
 
   BSP_UART_RegisterCallback(BSP_UART_DR16, BSP_UART_RX_CPLT_CB,
                             DR16_RxCpltCallback);
 
   inited = true;
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-int8_t dr16_restart(void) {
+err_t dr16_restart(void) {
   __HAL_UART_DISABLE(BSP_UART_GetHandle(BSP_UART_DR16));
   __HAL_UART_ENABLE(BSP_UART_GetHandle(BSP_UART_DR16));
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-int8_t dr16_start_dma_recv(dr16_t *dr16) {
+err_t dr16_start_dma_recv(dr16_t *dr16) {
   ASSERT(dr16);
   if (HAL_UART_Receive_DMA(BSP_UART_GetHandle(BSP_UART_DR16),
                            (uint8_t *)&(dr16->data),
                            sizeof(dr16->data)) == HAL_OK)
-    return DEVICE_OK;
-  return DEVICE_ERR;
+    return RM_OK;
+  return ERR_FAIL;
 }
 
 bool dr16_wait_dma_cplt(uint32_t timeout) {
   return xTaskNotifyWait(0, 0, SIGNAL_DR16_RAW_REDY, pdMS_TO_TICKS(timeout));
 }
 
-int8_t dr16_parse_rc(const dr16_t *dr16, cmd_rc_t *rc) {
+err_t dr16_parse_rc(const dr16_t *dr16, cmd_rc_t *rc) {
   ASSERT(dr16);
   ASSERT(rc);
 
   if (DR16_DataCorrupted(dr16)) {
-    return DEVICE_ERR;
+    return ERR_FAIL;
   } else {
     memset(rc, 0, sizeof(*rc));
   }
@@ -112,14 +112,14 @@ int8_t dr16_parse_rc(const dr16_t *dr16, cmd_rc_t *rc) {
   rc->key = dr16->data.key;
 
   rc->ch_res = ((float)dr16->data.res - DR16_CH_VALUE_MID) / full_range;
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-int8_t dr16_handle_offline(const dr16_t *dr16, cmd_rc_t *rc) {
+err_t dr16_handle_offline(const dr16_t *dr16, cmd_rc_t *rc) {
   ASSERT(dr16);
   ASSERT(rc);
 
   RM_UNUSED(dr16);
   memset(rc, 0, sizeof(*rc));
-  return DEVICE_OK;
+  return RM_OK;
 }

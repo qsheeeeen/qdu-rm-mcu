@@ -16,10 +16,10 @@ typedef struct {
   const ist8310_cali_t *cali;
 } ist8310_t;
 
-int8_t ist8310_init(ist8310_t *ist8310, const ist8310_cali_t *cali);
-int8_t ist8310_restart(void);
+err_t ist8310_init(ist8310_t *ist8310, const ist8310_cali_t *cali);
+err_t ist8310_restart(void);
 
 bool ist8310_wait_new(uint32_t timeout);
-int8_t ist8310_start_dma_recv();
+err_t ist8310_start_dma_recv();
 uint32_t ist8310_wait_dma_cplt();
-int8_t ist8310_parse(ist8310_t *ist8310);
+err_t ist8310_parse(ist8310_t *ist8310);

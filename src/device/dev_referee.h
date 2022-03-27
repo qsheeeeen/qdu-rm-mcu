@@ -354,21 +354,21 @@ typedef struct {
   referee_launcher_data_t launcher_data;
 } referee_for_launcher_t;
 
-int8_t referee_init(referee_t *ref, const ui_screen_t *screen);
-int8_t referee_restart(void);
+err_t referee_init(referee_t *ref, const ui_screen_t *screen);
+err_t referee_restart(void);
 void referee_handle_offline(referee_t *ref);
 
-int8_t referee_start_receiving(referee_t *ref);
+err_t referee_start_receiving(referee_t *ref);
 bool referee_wait_recv_cplt(uint32_t timeout);
-int8_t referee_parse(referee_t *ref);
+err_t referee_parse(referee_t *ref);
 
-uint8_t referee_refresh_ui(referee_t *ref);
-int8_t referee_pack_ui_packet(referee_t *ref);
-int8_t referee_start_transmit(referee_t *ref);
+err_t referee_refresh_ui(referee_t *ref);
+err_t referee_pack_ui_packet(referee_t *ref);
+err_t referee_start_transmit(referee_t *ref);
 bool referee_wait_trans_cplt(uint32_t timeout);
 
-uint8_t referee_pack_for_chassis(referee_for_chassis_t *c_ref,
-                                 const referee_t *ref);
-uint8_t referee_pack_for_launcher(referee_for_launcher_t *l_ref,
-                                  const referee_t *ref);
-uint8_t referee_pack_for_ai(referee_for_ai_t *ai_ref, const referee_t *ref);
+err_t referee_pack_for_chassis(referee_for_chassis_t *c_ref,
+                               const referee_t *ref);
+err_t referee_pack_for_launcher(referee_for_launcher_t *l_ref,
+                                const referee_t *ref);
+err_t referee_pack_for_ai(referee_for_ai_t *ai_ref, const referee_t *ref);

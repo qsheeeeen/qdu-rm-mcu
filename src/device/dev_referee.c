@@ -80,20 +80,20 @@ static void RefereeSlowRefreshTimerCallback(void *arg) {
               eSetValueWithOverwrite);
 }
 
-static int8_t Referee_SetPacketHeader(referee_header_t *header,
-                                      uint16_t data_length) {
+static err_t Referee_SetPacketHeader(referee_header_t *header,
+                                     uint16_t data_length) {
   header->sof = REF_HEADER_SOF;
   header->data_length = data_length;
   header->seq = 0;
   header->crc8 =
       crc8_calc((const uint8_t *)header,
                 sizeof(referee_header_t) - sizeof(uint8_t), CRC8_INIT);
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-static int8_t Referee_SetUiHeader(referee_inter_student_header_t *header,
-                                  const referee_student_cmd_id_t cmd_id,
-                                  referee_robot_id_t robot_id) {
+static err_t Referee_SetUiHeader(referee_inter_student_header_t *header,
+                                 const referee_student_cmd_id_t cmd_id,
+                                 referee_robot_id_t robot_id) {
   header->cmd_id = cmd_id;
   header->id_sender = robot_id;
   if (robot_id > 100) {
@@ -101,12 +101,12 @@ static int8_t Referee_SetUiHeader(referee_inter_student_header_t *header,
   } else {
     header->id_receiver = robot_id + 0x0100;
   }
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-int8_t referee_init(referee_t *ref, const ui_screen_t *screen) {
+err_t referee_init(referee_t *ref, const ui_screen_t *screen) {
   ASSERT(ref);
-  if (inited) return DEVICE_ERR_INITED;
+  if (inited) return ERR_INITED;
 
   gref = ref;
 
@@ -136,33 +136,33 @@ int8_t referee_init(referee_t *ref, const ui_screen_t *screen) {
   __HAL_UART_ENABLE_IT(BSP_UART_GetHandle(BSP_UART_REF), UART_IT_IDLE);
 
   inited = true;
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-int8_t referee_restart(void) {
+err_t referee_restart(void) {
   __HAL_UART_DISABLE(BSP_UART_GetHandle(BSP_UART_REF));
   __HAL_UART_ENABLE(BSP_UART_GetHandle(BSP_UART_REF));
-  return DEVICE_OK;
+  return RM_OK;
 }
 
 void referee_handle_offline(referee_t *ref) {
   ref->status = REF_STATUS_OFFLINE;
 }
 
-int8_t referee_start_receiving(referee_t *ref) {
+err_t referee_start_receiving(referee_t *ref) {
   RM_UNUSED(ref);
   if (HAL_UART_Receive_DMA(BSP_UART_GetHandle(BSP_UART_REF), rxbuf,
                            REF_LEN_RX_BUFF) == HAL_OK) {
-    return DEVICE_OK;
+    return RM_OK;
   }
-  return DEVICE_ERR;
+  return ERR_FAIL;
 }
 
 bool referee_wait_recv_cplt(uint32_t timeout) {
   return xTaskNotifyWait(0, 0, SIGNAL_REFEREE_RAW_REDY, pdMS_TO_TICKS(timeout));
 }
 
-int8_t referee_parse(referee_t *ref) {
+err_t referee_parse(referee_t *ref) {
   ref->status = REF_STATUS_RUNNING;
   uint32_t data_length =
       REF_LEN_RX_BUFF -
@@ -279,7 +279,7 @@ int8_t referee_parse(referee_t *ref) {
         size = sizeof(ref->keyboard_mouse);
         break;
       default:
-        return DEVICE_ERR;
+        return ERR_FAIL;
     }
     index += size;
 
@@ -290,10 +290,10 @@ int8_t referee_parse(referee_t *ref) {
     if (crc16_verify((uint8_t *)header, (uint8_t)(index - (uint8_t *)header)))
       memcpy(destination, index, size);
   }
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-uint8_t referee_refresh_ui(referee_t *ref) {
+err_t referee_refresh_ui(referee_t *ref) {
   ui_ele_t ele;
   ui_string_t string;
 
@@ -555,7 +555,7 @@ uint8_t referee_refresh_ui(referee_t *ref) {
 
   xTaskNotifyStateClear(xTaskGetCurrentTaskHandle());
 
-  return DEVICE_OK;
+  return RM_OK;
 }
 
 /**
@@ -565,7 +565,7 @@ uint8_t referee_refresh_ui(referee_t *ref) {
  * @param ref 裁判系统数据
  * @return int8_t 0代表成功
  */
-int8_t referee_pack_ui_packet(referee_t *ref) {
+err_t referee_pack_ui_packet(referee_t *ref) {
   ui_ele_t *ele = NULL;
   ui_string_t string;
   ui_del_t del;
@@ -599,7 +599,7 @@ int8_t referee_pack_ui_packet(referee_t *ref) {
       ui_cmd_id = REF_STDNT_CMD_ID_UI_DRAW7;
 
     } else {
-      return DEVICE_ERR;
+      return ERR_FAIL;
     }
     ele = pvPortMalloc(size_data_content);
     ui_ele_t *cursor = ele;
@@ -612,7 +612,7 @@ int8_t referee_pack_ui_packet(referee_t *ref) {
     size_data_content = sizeof(ui_string_t);
     ui_cmd_id = REF_STDNT_CMD_ID_UI_STR;
   } else {
-    return DEVICE_ERR;
+    return ERR_FAIL;
   }
 
   ref->packet.size =
@@ -637,14 +637,14 @@ int8_t referee_pack_ui_packet(referee_t *ref) {
   *crc = crc16_calc((const uint8_t *)ref->packet.data,
                     ref->packet.size - kSIZE_PACKET_CRC, CRC16_INIT);
 
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-int8_t referee_start_transmit(referee_t *ref) {
+err_t referee_start_transmit(referee_t *ref) {
   if (ref->packet.data == NULL) {
     xTaskNotify(gref->thread_alert, SIGNAL_REFEREE_PACKET_SENT,
                 eSetValueWithOverwrite);
-    return DEVICE_ERR_NULL;
+    return ERR_NULL;
   }
   if (HAL_UART_Transmit_DMA(BSP_UART_GetHandle(BSP_UART_REF), ref->packet.data,
                             (uint16_t)ref->packet.size) == HAL_OK) {
@@ -653,9 +653,9 @@ int8_t referee_start_transmit(referee_t *ref) {
     ref->packet.data = NULL;
     xTaskNotify(gref->thread_alert, SIGNAL_REFEREE_PACKET_SENT,
                 eSetValueWithOverwrite);
-    return DEVICE_OK;
+    return RM_OK;
   }
-  return DEVICE_ERR;
+  return ERR_FAIL;
 }
 
 bool referee_wait_trans_cplt(uint32_t timeout) {
@@ -663,32 +663,32 @@ bool referee_wait_trans_cplt(uint32_t timeout) {
                          pdMS_TO_TICKS(timeout));
 }
 
-uint8_t referee_pack_for_chassis(referee_for_chassis_t *c_ref,
-                                 const referee_t *ref) {
+err_t referee_pack_for_chassis(referee_for_chassis_t *c_ref,
+                               const referee_t *ref) {
   c_ref->chassis_power_limit = ref->robot_status.chassis_power_limit;
   c_ref->chassis_pwr_buff = ref->power_heat.chassis_pwr_buff;
   c_ref->chassis_watt = ref->power_heat.chassis_watt;
   c_ref->status = ref->status;
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-uint8_t referee_pack_for_launcher(referee_for_launcher_t *l_ref,
-                                  const referee_t *ref) {
+err_t referee_pack_for_launcher(referee_for_launcher_t *l_ref,
+                                const referee_t *ref) {
   memcpy(&(l_ref->power_heat), &(ref->power_heat), sizeof(l_ref->power_heat));
   memcpy(&(l_ref->robot_status), &(ref->robot_status),
          sizeof(l_ref->robot_status));
   memcpy(&(l_ref->launcher_data), &(ref->launcher_data),
          sizeof(l_ref->launcher_data));
   l_ref->status = ref->status;
-  return DEVICE_OK;
+  return RM_OK;
 }
 
-uint8_t referee_pack_for_ai(referee_for_ai_t *ai_ref, const referee_t *ref) {
+err_t referee_pack_for_ai(referee_for_ai_t *ai_ref, const referee_t *ref) {
   if (ref->robot_status.robot_id < REF_BOT_BLU_HERO)
     ai_ref->team = AI_TEAM_RED;
   else
     ai_ref->team = AI_TEAM_BLUE;
 
   ai_ref->status = ref->status;
-  return DEVICE_OK;
+  return RM_OK;
 }

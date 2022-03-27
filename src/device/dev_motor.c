@@ -67,13 +67,13 @@ err_t motor_init(motor_t *motor, const motor_group_t *group_cfg) {
   ASSERT(motor);
   ASSERT(group_cfg);
 
-  if (inited) return DEVICE_ERR_INITED;
+  if (inited) return ERR_INITED;
   motor->group_cfg = group_cfg;
 
   // can_register_rx_group();
 
   inited = true;
-  return DEVICE_OK;
+  return RM_OK;
 }
 
 err_t motor_update(motor_t *motor, uint32_t timeout) {

@@ -1,11 +1,5 @@
 #pragma once
 
-#define DEVICE_OK (0)
-#define DEVICE_ERR (-1)
-#define DEVICE_ERR_NULL (-2)
-#define DEVICE_ERR_INITED (-3)
-#define DEVICE_ERR_NO_DEV (-4)
-
 /*
   SIGNAL是用bit位置区分的，一个SIGNAL只能包含一个高bit位。
   不同的SIGNAL不能有相同的高bit位。

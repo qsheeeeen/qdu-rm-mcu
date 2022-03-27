@@ -46,10 +46,10 @@ bool bmi088_gyro_wait_new(bmi088_t *bmi088, uint32_t timeout);
   即BMI088_AcclStartDmaRecv() 和 bmi088_accl_wait_dma_cplt() 中间不能
   出现 bmi088_gyro_start_dma_recv()。
 */
-int8_t bmi088_accl_start_dma_recv();
-int8_t bmi088_accl_wait_dma_cplt(bmi088_t *bmi088);
-int8_t bmi088_gyro_start_dma_recv();
-int8_t bmi088_gyro_wait_dma_cplt(bmi088_t *bmi088);
-int8_t bmi088_parse_accl(bmi088_t *bmi088);
-int8_t bmi088_parse_gyro(bmi088_t *bmi088);
+err_t bmi088_accl_start_dma_recv();
+err_t bmi088_accl_wait_dma_cplt(bmi088_t *bmi088);
+err_t bmi088_gyro_start_dma_recv();
+err_t bmi088_gyro_wait_dma_cplt(bmi088_t *bmi088);
+err_t bmi088_parse_accl(bmi088_t *bmi088);
+err_t bmi088_parse_gyro(bmi088_t *bmi088);
 float bmi088_get_update_freq(bmi088_t *bmi088);
