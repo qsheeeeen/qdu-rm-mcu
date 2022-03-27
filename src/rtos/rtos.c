@@ -9,14 +9,14 @@ uint8_t ucHeap[configTOTAL_HEAP_SIZE] __attribute__((section(".ccmram")));
 /* TIM7 are used to generater high freq tick for debug. */
 volatile unsigned long runtime_ststus_timer_ticks;
 
-/* Hook prototypes */
-void configureTimerForRunTimeStats(void);
-unsigned long getRunTimeCounterValue(void);
+static void timer_callback(void) { runtime_ststus_timer_ticks++; }
 
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
 /* Code inside this function should be simple and small. */
 void configureTimerForRunTimeStats(void) {
   runtime_ststus_timer_ticks = 0;
+
+  // TODO: 注册 timer_callback
   HAL_TIM_Base_Start_IT(&htim7);
 }
 
