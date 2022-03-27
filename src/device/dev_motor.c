@@ -116,3 +116,7 @@ err_t motor_control(motor_t *motor, motor_group_id_t group,
   xQueueSendToBack(motor->msgq_tx, &pack, 0);
   return RM_OK;
 }
+
+err_t motor_handle_offline(motor_t *motor) {
+  memset(motor->feedback, 0, sizeof(motor->feedback));
+}
