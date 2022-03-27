@@ -486,7 +486,7 @@ static BaseType_t Command_SetMechZero(char *out_buffer, size_t len,
       /* 获取到云台数据，用can上的新的云台机械零点的位置替代旧的位置 */
       config_get(&cfg);
 
-      if (msg_dist_poll(gimbal_motor_sub, &motor_fb, 5)) {
+      if (!msg_dist_poll(gimbal_motor_sub, &motor_fb, 5)) {
         snprintf(out_buffer, len, "Can not get gimbal data.\r\n");
         fsm.stage = 2;
         return pdPASS;
@@ -530,7 +530,7 @@ static BaseType_t Command_SetGimbalLim(char *out_buffer, size_t len,
       return pdPASS;
     case 1:
       /* 获取云台数据，获取新的限位角并替代旧的限位角 */
-      if (msg_dist_poll(gimbal_motor_sub, &motor_fb, 5)) {
+      if (!msg_dist_poll(gimbal_motor_sub, &motor_fb, 5)) {
         fsm.stage = 3;
         return pdPASS;
       }
