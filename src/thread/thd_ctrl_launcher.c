@@ -32,7 +32,7 @@ void thd_ctrl_launcher(void* arg) {
       msg_dist_create_topic("launcher_ui", sizeof(ui_gimbal_t));
 
   subscriber_t* motor_sub = msg_dist_subscribe("launcher_motor_fb", true);
-  subscriber_t* ref_sub = msg_dist_subscribe("launcher_eulr", true);
+  subscriber_t* ref_sub = msg_dist_subscribe("referee_launcher", true);
   subscriber_t* cmd_sub = msg_dist_subscribe("cmd_launcher", true);
 
   /* 初始化发射器 */
